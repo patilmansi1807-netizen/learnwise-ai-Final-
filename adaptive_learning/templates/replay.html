@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="content-panel">
+    <h2>Learning Session Replay & Integrity Audit</h2>
+    <p class="subtitle">Complete audit trail of attempts, response latencies, and knowledge shifts.</p>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Concept</th>
+                <th>Outcome</th>
+                <th>Latency (s)</th>
+                <th>Prior p(L)</th>
+                <th>Updated p(L)</th>
+                <th>Net Shift</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for h in history %}
+            <tr>
+                <td>{{ h.time }}</td>
+                <td><strong>{{ h.concept }}</strong></td>
+                <td>
+                    {% if h.is_correct %}
+                    <span class="badge badge-success">&check; Correct</span>
+                    {% else %}
+                    <span class="badge badge-danger">&cross; Incorrect</span>
+                    {% endif %}
+                </td>
+                <td>{{ h.time_taken }}s</td>
+                <td>{{ h.p_before }}%</td>
+                <td>{{ h.p_after }}%</td>
+                <td class="{{ 'text-success' if h.delta >= 0 else 'text-danger' }}">
+                    {{ "+" if h.delta > 0 else "" }}{{ h.delta }}%
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" class="text-center">No learning attempts recorded yet. Launch a practice session to generate replay telemetry.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

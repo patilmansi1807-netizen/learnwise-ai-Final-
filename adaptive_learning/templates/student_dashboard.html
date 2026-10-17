@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard-head">
+    <div>
+        <h1 class="page-title">Welcome back, {{ user.username }}</h1>
+        <p class="subtitle">Bayesian Knowledge Tracing is active. Topics update dynamically based on concept mastery.</p>
+    </div>
+    <div class="subject-picker">
+        <form action="{{ url_for('switch_subject') }}" method="POST">
+            <label for="sub-select">Active Domain:</label>
+            <select id="sub-select" name="subject" onchange="this.form.submit()">
+                {% for sub in subjects %}
+                <option value="{{ sub.name }}" {% if sub.name == active_subject %}selected{% endif %}>{{ sub.name }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+</div>
+
+<!-- Recommended Action Card -->
+<div class="recommendation-card">
+    <div class="rec-meta">
+        <span class="pill-rec">Dynamic Recommendation</span>
+        <h2>{{ rec_concept.title if rec_concept else 'All Caught Up' }}</h2>
+        <p>{{ rec_reason }}</p>
+    </div>
+    <div class="rec-cta">
+        <a href="{{ url_for('practice', concept_code=rec_concept.code if rec_concept else '') }}" class="btn btn-primary">
+            Launch Targeted Practice &rarr;
+        </a>
+    </div>
+</div>
+
+<!-- Metrics Overview -->
+<div class="stat-grid">
+    <div class="stat-card">
+        <span class="stat-label">Mastered Concepts</span>
+        <span class="stat-val text-success">{{ mastered_count }}</span>
+        <span class="stat-desc">Mastery probability &ge; 75%</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Needs Practice</span>
+        <span class="stat-val text-warning">{{ struggling_count }}</span>
+        <span class="stat-desc">Prerequisite gaps identified</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Response Accuracy</span>
+        <span class="stat-val">{{ overall_accuracy }}%</span>
+        <span class="stat-desc">{{ total_attempts }} total recorded attempts</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">BKT Adaptation Rate</span>
+        <span class="stat-val text-accent">Active</span>
+        <span class="stat-desc">Per-step posterior inference</span>
+    </div>
+</div>
+
+<!-- Knowledge Breakdown Table -->
+<div class="content-panel">
+    <div class="panel-header">
+        <h3>Cognitive Domain Breakdown: {{ active_subject }}</h3>
+        <a href="{{ url_for('concept_map', subject=active_subject) }}" class="btn-link">View Prerequisite Graph</a>
+    </div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Concept</th>
+                <th>Estimated Mastery (pL)</th>
+                <th>Status</th>
+                <th>Prerequisites State</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in concepts %}
+            <tr>
+                <td><strong>{{ c.title }}</strong></td>
+                <td>
+                    <div class="progress-wrap">
+                        <div class="progress-bar" style="width: {{ c.mastery_pct }}%;"></div>
+                        <span class="progress-text">{{ c.mastery_pct }}%</span>
+                    </div>
+                </td>
+                <td>
+                    <span class="badge badge-{{ 'success' if c.status == 'Mastered' else ('warning' if c.status == 'In Progress' else 'danger') }}">
+                        {{ c.status }}
+                    </span>
+                </td>
+                <td>
+                    {% if c.prereqs_met %}
+                        <span class="text-success">&check; Satisfied</span>
+                    {% else %}
+                        <span class="text-danger">&cross; Needs: {{ c.missing_prereq }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('practice', concept_code=c.code) }}" class="btn-sm">Train Concept</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

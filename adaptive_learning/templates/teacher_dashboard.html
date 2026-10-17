@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard-head">
+    <div>
+        <h1 class="page-title">Instructor Intelligence Portal</h1>
+        <p class="subtitle">Classroom cohort metrics, prerequisite bottlenecks, and intervention alerts.</p>
+    </div>
+</div>
+
+<div class="section-title">Cohort Knowledge Gaps</div>
+<div class="stat-grid">
+    {% for topic in struggling_topics %}
+    <div class="stat-card border-danger">
+        <span class="stat-label">{{ topic.subject }}</span>
+        <h3 style="margin: 4px 0;">{{ topic.title }}</h3>
+        <span class="stat-val text-danger">{{ topic.avg_mastery }}%</span>
+        <span class="stat-desc">Cohort Average across {{ topic.student_count }} students</span>
+    </div>
+    {% else %}
+    <p>No systemic topic gaps identified across the cohort.</p>
+    {% endfor %}
+</div>
+
+<div class="content-panel" style="margin-top: 24px;">
+    <h3>Enrolled Students Mastery Status</h3>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Domain Focus</th>
+                <th>Attempts</th>
+                <th>Accuracy</th>
+                <th>Intervention Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in students %}
+            <tr>
+                <td><strong>{{ s.name }}</strong></td>
+                <td>{{ s.subject }}</td>
+                <td>{{ s.total_attempts }}</td>
+                <td>{{ s.accuracy }}%</td>
+                <td>
+                    {% if s.needs_intervention %}
+                    <span class="badge badge-danger">Intervention Recommended</span>
+                    {% else %}
+                    <span class="badge badge-success">On Track</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

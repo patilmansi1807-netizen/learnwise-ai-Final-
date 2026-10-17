@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="concept-map-view">
+    <div class="panel-header">
+        <div>
+            <h2>Knowledge Dependency Graph: {{ active_subject }}</h2>
+            <p class="subtitle">Visual representation of required foundations and unlockable concepts.</p>
+        </div>
+        <div class="legend">
+            <span class="legend-item"><span class="dot dot-mastered"></span> Mastered (&ge;75%)</span>
+            <span class="legend-item"><span class="dot dot-progress"></span> Learning (40-74%)</span>
+            <span class="legend-item"><span class="dot dot-attention"></span> Action Required (&lt;40%)</span>
+        </div>
+    </div>
+
+    <div class="graph-canvas" id="graph-container">
+        <!-- SVG Connecting Edges -->
+        <svg id="edge-layer"></svg>
+        
+        <!-- Rendered Interactive Nodes -->
+        <div class="nodes-container">
+            {% for node in nodes %}
+            <div class="concept-node node-{{ node.status }}" id="node-{{ node.id }}" data-id="{{ node.id }}" style="left: {{ (node.tier - 1) * 280 + 60 }}px; top: {{ 100 + loop.index0 * 70 }}px;">
+                <div class="node-title">{{ node.label }}</div>
+                <div class="node-metric">{{ node.mastery }}% Mastery</div>
+                <a href="{{ url_for('practice', concept_code=node.id) }}" class="node-link">Practice</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+    window.GRAPH_EDGES = {{ edges|tojson }};
+</script>
+{% endblock %}

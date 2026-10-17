@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="practice-container">
+    <div class="practice-header">
+        <div>
+            <span class="badge badge-accent">{{ concept.subject_name }}</span>
+            <h2>{{ concept.title }}</h2>
+        </div>
+        <div class="mastery-indicator">
+            <span>Current Estimated Mastery:</span>
+            <strong id="live-mastery">{{ mastery_pct }}%</strong>
+        </div>
+    </div>
+
+    <!-- Question Card -->
+    <div class="card card-question" id="question-box">
+        <div class="q-difficulty">Difficulty: {{ (question.difficulty * 10)|round(1) }}/10</div>
+        <p class="question-text">{{ question.text }}</p>
+
+        <form id="quiz-form">
+            <input type="hidden" id="question-id" value="{{ question.id }}">
+            <input type="hidden" id="concept-code" value="{{ concept.code }}">
+            <div class="options-list">
+                <label class="option-item"><input type="radio" name="opt" value="A"> <span><strong>A.</strong> {{ question.option_a }}</span></label>
+                <label class="option-item"><input type="radio" name="opt" value="B"> <span><strong>B.</strong> {{ question.option_b }}</span></label>
+                <label class="option-item"><input type="radio" name="opt" value="C"> <span><strong>C.</strong> {{ question.option_c }}</span></label>
+                <label class="option-item"><input type="radio" name="opt" value="D"> <span><strong>D.</strong> {{ question.option_d }}</span></label>
+            </div>
+            <div class="action-bar">
+                <button type="submit" class="btn btn-primary" id="btn-submit">Submit Answer</button>
+            </div>
+        </form>
+
+        <!-- Feedback & Diagnostics -->
+        <div id="feedback-panel" class="feedback-panel hidden">
+            <div id="feedback-alert" class="alert"></div>
+            <div id="misconception-box" class="misconception-box hidden">
+                <strong>Knowledge Gap Identified:</strong>
+                <p id="misconception-text"></p>
+            </div>
+            <div class="explanation-box">
+                <strong>Solution Walkthrough:</strong>
+                <p id="explanation-text"></p>
+            </div>
+            <div class="bkt-shift">
+                <span>Knowledge Tracing Shift: </span>
+                <span id="shift-text"></span>
+            </div>
+            <div class="action-bar">
+                <a href="{{ url_for('practice', concept_code=concept.code) }}" class="btn btn-primary">Next Adaptive Question &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Tutor Assistant Box -->
+    <div class="tutor-card">
+        <div class="tutor-header">
+            <h3>Personal AI Cognitive Tutor</h3>
+            <p>Stuck? Request progressive assistance before guessing.</p>
+        </div>
+        <div class="tutor-actions">
+            <button class="btn btn-secondary" onclick="askTutor('hint')">Request a Hint</button>
+            <button class="btn btn-secondary" onclick="askTutor('real_life')">Real-Life Analogy</button>
+            <button class="btn btn-secondary" onclick="askTutor('step_by_step')">Step-by-Step Breakdown</button>
+        </div>
+        <div id="tutor-response" class="tutor-response hidden">
+            <h4 id="tutor-mode-title">Tutor Guidance</h4>
+            <p id="tutor-content"></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
